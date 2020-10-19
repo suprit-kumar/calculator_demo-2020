@@ -2,6 +2,21 @@ const calculatorDisplay = document.querySelector('h1');
 const inputBtns = document.querySelectorAll('button');
 const clearBtn = document.getElementById('clear-btn');
 
+// Calculate first and second values depending on operator
+const calculate = {
+    '/': (firstNumber, secondNumber) => firstNumber / secondNumber,
+
+    '*': (firstNumber, secondNumber) => firstNumber * secondNumber,
+
+    '+': (firstNumber, secondNumber) => firstNumber + secondNumber,
+
+    '-': (firstNumber, secondNumber) => firstNumber - secondNumber,
+
+    '=': (firstNumber, secondNumber) => secondNumber,
+}
+
+
+
 let firstValue = 0;
 let operatorValue = '';
 let awaitingNextValue = false;
@@ -20,7 +35,6 @@ function sendNumberValue(number){
     }
 }
 
-
 function addDecimal(){
     // if operator pressed don't add decimal
     if(awaitingNextValue === true) return;
@@ -30,22 +44,36 @@ function addDecimal(){
     }
 }
 
-
 function useOperator(operator){
     const currentValue = Number(calculatorDisplay.textContent);
+    // Prevent multiple operators
+    if(operatorValue && awaitingNextValue){
+        operatorValue = operator;
+        return;
+    } 
     // assign first value if no value
     if(!firstValue){
         firstValue = currentValue;
     }else{
-        console.log('currentValue',currentValue)
+        // console.log(firstValue,operatorValue,currentValue);
+        const calculation = calculate[operatorValue](firstValue,currentValue);
+        calculatorDisplay.textContent = calculation;
+        // console.log('calculation',calculation);
+        firstValue = calculation;
     }
     // Ready for next value , store operator
     awaitingNextValue = true;
     operatorValue = operator;
-    console.log('firstvalue',firstValue);
-    console.log('operatorValue',operatorValue);
 }
 
+
+// clear all values, display
+function clearDisplay(){
+     firstValue = 0;
+     operatorValue = '';
+     awaitingNextValue = false;
+    calculatorDisplay.textContent = '0';
+}
 
 
 // Add Event Listners for number,operators,decimal buttons
@@ -59,13 +87,7 @@ inputBtns.forEach((inputBtn) =>{
     }
 });
 
-// clear all values, display
-function clearDisplay(){
-     firstValue = 0;
-     operatorValue = '';
-     awaitingNextValue = false;
-    calculatorDisplay.textContent = '0';
-}
+
 
 clearBtn.addEventListener('click',clearDisplay);
 
